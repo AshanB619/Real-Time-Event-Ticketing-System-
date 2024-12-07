@@ -13,7 +13,7 @@ public class Ticket_pool_Service {
     }
 
     @Transactional
-    public synchronized void addTicket(int Current_ticket_number,String vendor_details) {
+    public synchronized void addTicket(int Current_ticket_number,String vendor_details)throws InterruptedException {
         Tickets ticket1=new Tickets();
         ticket1.setTotal_tickets(Current_ticket_number);
         ticket1.setStatus_of_ticket(true);
@@ -22,6 +22,9 @@ public class Ticket_pool_Service {
         System.out.println("Ticket_Number "+Current_ticket_number+"added to the pool by "+vendor_details);
 
     }
+
+    @Transactional
+    public synchronized void updateTicket(int Current_ticket_number,String vendor_details) {}
 
 
 }
