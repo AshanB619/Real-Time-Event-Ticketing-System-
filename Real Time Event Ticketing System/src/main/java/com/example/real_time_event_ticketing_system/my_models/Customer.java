@@ -3,7 +3,7 @@ package com.example.real_time_event_ticketing_system.my_models;
 import jakarta.persistence.*;
 
 @Entity
-public class Consumer {
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -12,7 +12,7 @@ public class Consumer {
     private int customer_retrieval_Rate;
     private int total_Ticket_By_Customer;
 
-    public Consumer() {
+    public Customer() {
 
     }
 

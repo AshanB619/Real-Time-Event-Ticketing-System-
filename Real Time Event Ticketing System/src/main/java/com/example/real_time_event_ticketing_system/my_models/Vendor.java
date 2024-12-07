@@ -41,5 +41,5 @@ public class Vendor {
     public void setTotal_Ticket_By_Vendor(int total_Ticket_By_Vendor) {
         this.total_Ticket_By_Vendor = total_Ticket_By_Vendor;
     }
-    
+
 }
