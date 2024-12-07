@@ -7,7 +7,7 @@ public class Consumer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Long customer_Id;
+    private int customer_Id;
     private String customer_Name;
     private int customer_retrieval_Rate;
     private int total_Ticket_By_Customer;
@@ -16,10 +16,10 @@ public class Consumer {
 
     }
 
-    public Long getCustomer_Id() {
+    public int getCustomer_Id() {
         return customer_Id;
     }
-    public void setCustomer_Id(Long customer_Id) {
+    public void setCustomer_Id(int customer_Id) {
         this.customer_Id = customer_Id;
     }
     public String getCustomer_Name() {
@@ -41,5 +41,5 @@ public class Consumer {
         this.total_Ticket_By_Customer = total_Ticket_By_Customer;
 
     }
-    
+
 }

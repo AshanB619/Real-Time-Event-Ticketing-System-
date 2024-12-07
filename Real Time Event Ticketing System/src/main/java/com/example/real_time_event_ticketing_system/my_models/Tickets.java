@@ -5,19 +5,19 @@ import jakarta.persistence.*;
 @Entity
 public class Tickets {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Long ticket_id;
+    private int ticket_id;
     private boolean status_of_ticket;
 
     public Tickets() {
 
     }
 
-    public Long getTicket_id() {
+    public int getTicket_id() {
         return ticket_id;
     }
-    public void setTicket_id(Long ticket_id) {
+    public void setTicket_id(int ticket_id) {
         this.ticket_id = ticket_id;
     }
     public boolean isStatus_of_ticket() {
