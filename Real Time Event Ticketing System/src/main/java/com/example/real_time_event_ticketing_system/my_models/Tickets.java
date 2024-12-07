@@ -8,10 +8,10 @@ public class Tickets {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private int ticket_id;
+    private int Total_tickets;
     private boolean status_of_ticket;
 
     public Tickets() {
-
     }
 
     public int getTicket_id() {
@@ -22,15 +22,16 @@ public class Tickets {
     }
     public boolean isStatus_of_ticket() {
         return status_of_ticket;
-
     }
+
     public void setStatus_of_ticket(boolean status_of_ticket) {
         this.status_of_ticket = status_of_ticket;
     }
-
-
-
-
-
+    public int getTotal_tickets() {
+        return Total_tickets;
+    }
+    public void setTotal_tickets(int total_tickets) {
+        this.Total_tickets = total_tickets;
+    }
 
 }

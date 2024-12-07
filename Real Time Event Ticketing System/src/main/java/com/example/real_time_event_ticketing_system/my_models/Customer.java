@@ -9,7 +9,9 @@ public class Customer {
     @Column(nullable = false)
     private int customer_Id;
     private String customer_Name;
+    @Column(name ="Retrival_rate")
     private int customer_retrieval_Rate;
+    @Column(name ="Total_Tickets")
     private int total_Ticket_By_Customer;
 
     public Customer() {
