@@ -1,5 +1,6 @@
 package com.example.real_time_event_ticketing_system.my_controller;
 
+import com.example.real_time_event_ticketing_system.my_models.Customer;
 import com.example.real_time_event_ticketing_system.my_models.system_details;
 import com.example.real_time_event_ticketing_system.my_repository.For_Customer_Repo;
 import com.example.real_time_event_ticketing_system.my_repository.For_Vendor_Repo;
@@ -7,6 +8,8 @@ import com.example.real_time_event_ticketing_system.my_service.Ticket_pool_Servi
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.PriorityQueue;
 
 @RestController
 @RequestMapping("/simulation/config")
@@ -34,8 +37,20 @@ public class Ticket_simulation_config {
                 }
             }
         }).start();
-
-        
+        PriorityQueue<Customer>customers_queue=new PriorityQueue<>(for_Customer_Repo.get_vip_order());
+        while (!customers_queue.isEmpty()){
+            Customer customer=customers_queue.poll();
+            new Thread(()->{
+                for (int i=1;i<=customer.getTotal_Ticket_By_Customer();i++){
+                    try {
+                        ticket_pool_service.Release_Ticket(customer.getCustomer_Name());
+                        Thread.sleep(1000L * system_details.getTickets_Release_rate());
+                    }catch (InterruptedException e){
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }).start();
+        }
     }
 }
 

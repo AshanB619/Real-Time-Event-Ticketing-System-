@@ -11,6 +11,7 @@ public class Customer {
     private String customer_Name;
     @Column(name ="Total_Tickets")
     private int total_Ticket_By_Customer;
+    private boolean vip_cus;
 
     public Customer() {
 
@@ -35,6 +36,12 @@ public class Customer {
     public void setTotal_Ticket_By_Customer(int total_Ticket_By_Customer) {
         this.total_Ticket_By_Customer = total_Ticket_By_Customer;
 
+    }
+    public boolean isVip_cus() {
+        return vip_cus;
+    }
+    public void setVip_cus(boolean vip_cus) {
+        this.vip_cus = vip_cus;
     }
 
 }
