@@ -8,7 +8,6 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int vendor_Id;
     private String vendor_Name;
-    private int release_rate;
     @Column(name = "Total_Ticket")
     private int total_Ticket_By_Vendor;
 
@@ -34,11 +33,5 @@ public class Vendor {
         this.total_Ticket_By_Vendor = total_Ticket_By_Vendor;
     }
 
-    public int getRelease_rate() {
-        return release_rate;
-    }
-    public void setRelease_rate(int release_rate) {
-        this.release_rate = release_rate;
-    }
 
 }

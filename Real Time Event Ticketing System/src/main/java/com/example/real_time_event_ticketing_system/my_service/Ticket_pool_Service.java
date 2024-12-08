@@ -18,10 +18,7 @@ public class Ticket_pool_Service {
 
     @Transactional
     public synchronized void addTicket(int Current_ticket_number,String vendor_details)throws InterruptedException {
-        Tickets ticket1=new Tickets();
-        ticket1.setTickets_Number(Current_ticket_number);
-        ticket1.setStatus_of_ticket(true);
-        for_Ticket_Repo.save(ticket1);
+        while (for_Ticket_Repo.)
 
         System.out.println("Ticket_Number "+Current_ticket_number+"added to the pool by "+vendor_details);
 

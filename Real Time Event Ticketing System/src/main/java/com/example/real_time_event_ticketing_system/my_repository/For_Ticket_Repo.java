@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface For_Ticket_Repo extends JpaRepository<Tickets, Integer> {
-    List<Tickets> List_for_unsold_tickets();
+    int current_ticket_availability(boolean availability);
+    
 }
