@@ -9,6 +9,10 @@ public class system_details {
     private int Customer_Retrieval_Rate;
     private int Maximum_Ticket_Capacity;
 
+    public system_details() {
+
+    }
+
     public int getTotal_Number_of_Tickets() {
         return Total_Number_of_Tickets;
     }
@@ -33,5 +37,6 @@ public class system_details {
     public void setMaximum_Ticket_Capacity(int maximum_Ticket_Capacity) {
         Maximum_Ticket_Capacity = maximum_Ticket_Capacity;
     }
-    
+
+
 }
