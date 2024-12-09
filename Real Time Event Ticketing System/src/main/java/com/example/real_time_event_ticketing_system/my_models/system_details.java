@@ -1,8 +1,10 @@
 package com.example.real_time_event_ticketing_system.my_models;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope("singleton")
 public class system_details {
     private int Total_Number_of_Tickets;
     private int Tickets_Release_rate;

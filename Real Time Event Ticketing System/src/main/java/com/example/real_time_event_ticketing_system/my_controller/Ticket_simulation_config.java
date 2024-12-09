@@ -44,7 +44,7 @@ public class Ticket_simulation_config {
                 for (int i=1;i<=customer.getTotal_Ticket_By_Customer();i++){
                     try {
                         ticket_pool_service.Release_Ticket(customer.getCustomer_Name());
-                        Thread.sleep(1000L * system_details.getTickets_Release_rate());
+                        Thread.sleep(1000L * system_details.getCustomer_Retrieval_Rate());
                     }catch (InterruptedException e){
                         Thread.currentThread().interrupt();
                     }
