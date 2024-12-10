@@ -13,13 +13,12 @@ public class System_details_config {
     }
 
     @PostMapping("/set/details")
-    public String set_system_details(@RequestBody system_details systemDetails) {
-        system_details.setTotal_Number_of_Tickets(systemDetails.getTotal_Number_of_Tickets());
-        system_details.setTickets_Release_rate(systemDetails.getTickets_Release_rate());
-        system_details.setCustomer_Retrieval_Rate(systemDetails.getCustomer_Retrieval_Rate());
-        system_details.setMaximum_Ticket_Capacity(systemDetails.getMaximum_Ticket_Capacity());
-
-        return "System details updated successfully";
+    public void set_system_details(@RequestBody system_details details) {
+        this.system_details.setTotal_Number_of_Tickets(details.getTotal_Number_of_Tickets());
+        this.system_details.setTickets_Release_rate(details.getTickets_Release_rate());
+        this.system_details.setCustomer_Retrieval_Rate(details.getCustomer_Retrieval_Rate());
+        this.system_details.setMaximum_Ticket_Capacity(details.getMaximum_Ticket_Capacity());
     }
+
 
 }
