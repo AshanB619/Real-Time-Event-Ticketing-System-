@@ -11,10 +11,12 @@ import java.util.Optional;
 public class Ticket_pool_Service {
 
     private final For_Ticket_Repo forTicketRepo;
+    private final log_details_service log_details_service;
 
     @Autowired
-    public Ticket_pool_Service(For_Ticket_Repo forTicketRepo) {
+    public Ticket_pool_Service(For_Ticket_Repo forTicketRepo,log_details_service log_details_service) {
         this.forTicketRepo = forTicketRepo;
+        this.log_details_service = log_details_service;
     }
 
     public  synchronized void addTicket(int ticketNumber,String vendor_name) {
@@ -22,7 +24,8 @@ public class Ticket_pool_Service {
         ticket.setTickets_Number(ticketNumber);
         ticket.setStatus_of_ticket(false);
         forTicketRepo.save(ticket);
-        System.out.println("Ticket_Number " + ticket.getTicket_id() + "  Added to the pool  by "+vendor_name );
+        String log_add="Ticket_Number " + ticket.getTicket_id() + "  Added to the pool  by "+vendor_name;
+        log_details_service.add_details(log_add);
     }
     public synchronized boolean Release_Ticket(String customerName) {
         Optional<Tickets> optionalTicket = forTicketRepo.to_find_first_ticket();
@@ -30,10 +33,12 @@ public class Ticket_pool_Service {
             Tickets ticket = optionalTicket.get();
             ticket.setStatus_of_ticket(true);
             forTicketRepo.save(ticket);
-            System.out.println("Ticket_Number " + ticket.getTicket_id() + "  bought from the pool by " + customerName);
+            String log_release="Ticket_Number " + ticket.getTicket_id() + "  bought from the pool by " + customerName;
+            log_details_service.add_details(log_release);
             return true;
         }else {
             return false;
         }
     }
+
 }

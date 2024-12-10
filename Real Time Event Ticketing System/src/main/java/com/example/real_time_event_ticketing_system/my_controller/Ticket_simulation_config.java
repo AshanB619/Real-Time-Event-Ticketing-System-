@@ -32,12 +32,15 @@ public class Ticket_simulation_config {
 
     @PostMapping("/start/simulation")
     public void start_Simulation() {
-        List<Vendor> vendor_List = for_Vendor_Repo.findAll();
-        for (Vendor vendor : vendor_List) {
+        List<Vendor> vendorList = for_Vendor_Repo.findAll();
+        for (Vendor vendor : vendorList) {
             new Thread(() -> {
                 for (int i = 1; i <= vendor.getTotal_Ticket_By_Vendor(); i++) {
                     try {
-                        ticket_pool_service.addTicket(i, vendor.getVendor_Name());
+                        synchronized (ticketLock) {
+                            ticket_pool_service.addTicket(i, vendor.getVendor_Name());
+                            ticketLock.notifyAll(); // Notify customers that a ticket is available
+                        }
                         Thread.sleep(1000L * system_details.getTickets_Release_rate());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
@@ -46,13 +49,17 @@ public class Ticket_simulation_config {
             }).start();
         }
 
-        PriorityQueue<Customer> customers_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
-        while (!customers_order.isEmpty()) {
-            Customer customer = customers_order.poll();
+        PriorityQueue<Customer> customer_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
+        while (!customer_order.isEmpty()) {
+            Customer customer1 = customer_order.poll();
             new Thread(() -> {
-                for (int i = 1; i <= customer.getTotal_Ticket_By_Customer(); i++) {
+                for (int i = 1; i <= customer1.getTotal_Ticket_By_Customer(); i++) {
                     try {
-                        ticket_pool_service.Release_Ticket(customer.getCustomer_Name());
+                        synchronized (ticketLock) {
+                            while (!ticket_pool_service.Release_Ticket(customer1.getCustomer_Name())) {
+                                ticketLock.wait();
+                            }
+                        }
                         Thread.sleep(1000L * system_details.getCustomer_Retrieval_Rate());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
