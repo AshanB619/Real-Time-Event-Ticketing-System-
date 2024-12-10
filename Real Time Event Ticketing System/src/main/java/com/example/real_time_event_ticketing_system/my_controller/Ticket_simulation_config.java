@@ -31,36 +31,35 @@ public class Ticket_simulation_config {
     }
 
     @PostMapping("/start/simulation")
-    public void startSimulation() {
-        new Thread(() -> {
-            List<Vendor> vendorList = for_Vendor_Repo.findAll();
-            for (Vendor for_vendor : vendorList) {
-                String vendorName = for_vendor.getVendor_Name();
-                for (int i = 1; i <= for_vendor.getTotal_Ticket_By_Vendor(); i++) {
+    public void start_Simulation() {
+        List<Vendor> vendor_List = for_Vendor_Repo.findAll();
+        for (Vendor vendor : vendor_List) {
+            new Thread(() -> {
+                for (int i = 1; i <= vendor.getTotal_Ticket_By_Vendor(); i++) {
                     try {
-                        ticket_pool_service.addTicket(i, vendorName);
+                        ticket_pool_service.addTicket(i, vendor.getVendor_Name());
                         Thread.sleep(1000L * system_details.getTickets_Release_rate());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
-            }
-        }).start();
-        new Thread(() -> {
-            PriorityQueue<Customer> customer_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
-            while (!customer_order.isEmpty()) {
-                Customer customer = customer_order.poll();
+            }).start();
+        }
+
+        PriorityQueue<Customer> customers_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
+        while (!customers_order.isEmpty()) {
+            Customer customer = customers_order.poll();
+            new Thread(() -> {
                 for (int i = 1; i <= customer.getTotal_Ticket_By_Customer(); i++) {
                     try {
-                        while (!ticket_pool_service.Release_Ticket(customer.getCustomer_Name())){
-                            Thread.sleep(1000L);
-                        }
+                        ticket_pool_service.Release_Ticket(customer.getCustomer_Name());
                         Thread.sleep(1000L * system_details.getCustomer_Retrieval_Rate());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
-            }
-        }).start();
+            }).start();
         }
     }
+
+}
