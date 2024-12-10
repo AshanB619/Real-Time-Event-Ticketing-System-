@@ -21,6 +21,7 @@ public class Ticket_simulation_config {
     private final For_Customer_Repo for_Customer_Repo;
     private final system_details system_details;
 
+    private final Object ticketLock = new Object();
 
     public Ticket_simulation_config(Ticket_pool_Service ticketPoolService, For_Vendor_Repo forVendorRepo, For_Customer_Repo forCustomerRepo, system_details systemDetails) {
         this.ticket_pool_service = ticketPoolService;
@@ -32,31 +33,34 @@ public class Ticket_simulation_config {
     @PostMapping("/start/simulation")
     public void startSimulation() {
         new Thread(() -> {
-            List<Vendor>vendor_List=for_Vendor_Repo.findAll();
-            String vendor_name=vendor_List.get(0).getVendor_Name();
-            for (int i = 1; i <= system_details.getTotal_Number_of_Tickets(); i++) {
-                try {
-                    ticket_pool_service.addTicket(i,vendor_name);
-                    Thread.sleep(1000L * system_details.getTickets_Release_rate());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            List<Vendor> vendorList = for_Vendor_Repo.findAll();
+            for (Vendor for_vendor : vendorList) {
+                String vendorName = for_vendor.getVendor_Name();
+                for (int i = 1; i <= for_vendor.getTotal_Ticket_By_Vendor(); i++) {
+                    try {
+                        ticket_pool_service.addTicket(i, vendorName);
+                        Thread.sleep(1000L * system_details.getTickets_Release_rate());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }).start();
-        PriorityQueue<Customer> customers_queue = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
-        while (!customers_queue.isEmpty()) {
-            Customer customer = customers_queue.poll();
-            new Thread(() -> {
+        new Thread(() -> {
+            PriorityQueue<Customer> customer_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
+            while (!customer_order.isEmpty()) {
+                Customer customer = customer_order.poll();
                 for (int i = 1; i <= customer.getTotal_Ticket_By_Customer(); i++) {
                     try {
-                        ticket_pool_service.Release_Ticket(customer.getCustomer_Name());
+                        while (!ticket_pool_service.Release_Ticket(customer.getCustomer_Name())){
+                            Thread.sleep(1000L);
+                        }
                         Thread.sleep(1000L * system_details.getCustomer_Retrieval_Rate());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
-            }).start();
+            }
+        }).start();
         }
     }
-}
-

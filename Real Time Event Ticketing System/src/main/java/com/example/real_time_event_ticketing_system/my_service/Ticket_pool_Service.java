@@ -17,20 +17,23 @@ public class Ticket_pool_Service {
         this.forTicketRepo = forTicketRepo;
     }
 
-    public void addTicket(int ticketNumber,String vendor_name) {
+    public  synchronized void addTicket(int ticketNumber,String vendor_name) {
         Tickets ticket = new Tickets();
         ticket.setTickets_Number(ticketNumber);
         ticket.setStatus_of_ticket(false);
         forTicketRepo.save(ticket);
         System.out.println("Ticket_Number " + ticket.getTicket_id() + "  Added to the pool  by "+vendor_name );
     }
-    public void Release_Ticket(String customerName) {
+    public synchronized boolean Release_Ticket(String customerName) {
         Optional<Tickets> optionalTicket = forTicketRepo.to_find_first_ticket();
         if (optionalTicket.isPresent()) {
             Tickets ticket = optionalTicket.get();
             ticket.setStatus_of_ticket(true);
             forTicketRepo.save(ticket);
             System.out.println("Ticket_Number " + ticket.getTicket_id() + "  bought from the pool by " + customerName);
+            return true;
+        }else {
+            return false;
         }
     }
 }

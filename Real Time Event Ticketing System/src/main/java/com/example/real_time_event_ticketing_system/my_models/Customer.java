@@ -3,7 +3,7 @@ package com.example.real_time_event_ticketing_system.my_models;
 import jakarta.persistence.*;
 
 @Entity
-public class Customer {
+public class Customer implements  Comparable<Customer> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -42,6 +42,15 @@ public class Customer {
     }
     public void setVip_cus(boolean vip_cus) {
         this.vip_cus = vip_cus;
+    }
+
+    @Override
+    public int compareTo(Customer for_other){
+        if (this.vip_cus!=for_other.vip_cus){
+            return Boolean.compare(for_other.vip_cus,this.vip_cus);
+        }else{
+            return Integer.compare(this.total_Ticket_By_Customer, for_other.total_Ticket_By_Customer);
+        }
     }
 
 }
