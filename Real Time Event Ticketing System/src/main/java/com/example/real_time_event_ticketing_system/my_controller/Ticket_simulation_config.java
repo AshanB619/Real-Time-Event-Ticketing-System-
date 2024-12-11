@@ -20,7 +20,6 @@ public class Ticket_simulation_config {
     private final For_Vendor_Repo for_Vendor_Repo;
     private final For_Customer_Repo for_Customer_Repo;
     private final system_details system_details;
-
     private final Object ticketLock = new Object();
 
     public Ticket_simulation_config(Ticket_pool_Service ticketPoolService, For_Vendor_Repo forVendorRepo, For_Customer_Repo forCustomerRepo, system_details systemDetails) {
@@ -38,8 +37,9 @@ public class Ticket_simulation_config {
                 for (int i = 1; i <= vendor.getTotal_Ticket_By_Vendor(); i++) {
                     try {
                         synchronized (ticketLock) {
-                            ticket_pool_service.addTicket(i, vendor.getVendor_Name());
-                            ticketLock.notifyAll(); // Notify customers that a ticket is available
+                            // Pass the vendor object instead of just the name
+                            ticket_pool_service.addTicket(i, vendor);
+                            ticketLock.notifyAll();
                         }
                         Thread.sleep(1000L * system_details.getTickets_Release_rate());
                     } catch (InterruptedException e) {
@@ -50,23 +50,29 @@ public class Ticket_simulation_config {
         }
 
         PriorityQueue<Customer> customer_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
-        while (!customer_order.isEmpty()) {
-            Customer customer1 = customer_order.poll();
-            new Thread(() -> {
-                for (int i = 1; i <= customer1.getTotal_Ticket_By_Customer(); i++) {
-                    try {
-                        synchronized (ticketLock) {
-                            while (!ticket_pool_service.Release_Ticket(customer1.getCustomer_Name())) {
+
+        new Thread(() -> {
+            while (!customer_order.isEmpty()) {
+                Customer currentCustomer = customer_order.peek(); // don't poll yet, poll after done
+                for (int i = 1; i <= currentCustomer.getTotal_Ticket_By_Customer(); i++) {
+                    synchronized (ticketLock) {
+                        while (!ticket_pool_service.Release_Ticket(currentCustomer)) {
+                            try {
                                 ticketLock.wait();
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
                             }
                         }
+                    }
+                    try {
                         Thread.sleep(1000L * system_details.getCustomer_Retrieval_Rate());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
-            }).start();
+                customer_order.poll();
+            }
+        }).start();
         }
     }
 
-}
