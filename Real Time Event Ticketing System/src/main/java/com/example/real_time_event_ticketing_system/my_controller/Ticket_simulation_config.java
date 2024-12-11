@@ -20,7 +20,8 @@ public class Ticket_simulation_config {
     private final For_Vendor_Repo for_Vendor_Repo;
     private final For_Customer_Repo for_Customer_Repo;
     private final system_details system_details;
-    private final Object ticketLock = new Object();
+    private final Object ticket_lock = new Object();
+    private volatile boolean simulation_check = true;
 
     public Ticket_simulation_config(Ticket_pool_Service ticketPoolService, For_Vendor_Repo forVendorRepo, For_Customer_Repo forCustomerRepo, system_details systemDetails) {
         this.ticket_pool_service = ticketPoolService;
@@ -31,15 +32,19 @@ public class Ticket_simulation_config {
 
     @PostMapping("/start/simulation")
     public void start_Simulation() {
-        List<Vendor> vendorList = for_Vendor_Repo.findAll();
-        for (Vendor vendor : vendorList) {
+        simulation_check = true;
+
+        List<Vendor> for_vendor_List = for_Vendor_Repo.findAll();
+        for (Vendor vendor : for_vendor_List) {
             new Thread(() -> {
                 for (int i = 1; i <= vendor.getTotal_Ticket_By_Vendor(); i++) {
+                    if (!simulation_check) {
+                        return;
+                    }
                     try {
-                        synchronized (ticketLock) {
-                            // Pass the vendor object instead of just the name
+                        synchronized (ticket_lock) {
                             ticket_pool_service.addTicket(i, vendor);
-                            ticketLock.notifyAll();
+                            ticket_lock.notifyAll();
                         }
                         Thread.sleep(1000L * system_details.getTickets_Release_rate());
                     } catch (InterruptedException e) {
@@ -52,20 +57,23 @@ public class Ticket_simulation_config {
         PriorityQueue<Customer> customer_order = new PriorityQueue<>(for_Customer_Repo.get_vip_order());
 
         new Thread(() -> {
-            while (!customer_order.isEmpty()) {
-                Customer currentCustomer = customer_order.peek(); // don't poll yet, poll after done
+            while (!customer_order.isEmpty() && simulation_check) {
+                Customer currentCustomer = customer_order.peek();
                 for (int i = 1; i <= currentCustomer.getTotal_Ticket_By_Customer(); i++) {
-                    synchronized (ticketLock) {
+                    if (!simulation_check) {
+                        return;
+                    }
+                    synchronized (ticket_lock) {
                         while (!ticket_pool_service.Release_Ticket(currentCustomer)) {
                             try {
-                                ticketLock.wait();
+                                ticket_lock.wait();
                             } catch (InterruptedException e) {
                                 throw new RuntimeException(e);
                             }
                         }
                     }
                     try {
-                        Thread.sleep(1000L * system_details.getCustomer_Retrieval_Rate());
+                        Thread.sleep(system_details.getCustomer_Retrieval_Rate() * 1000L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -73,6 +81,14 @@ public class Ticket_simulation_config {
                 customer_order.poll();
             }
         }).start();
-        }
     }
 
+    @PostMapping("/stop/simulation")
+    public String stop_Simulation() {
+        simulation_check = false;
+        synchronized (ticket_lock) {
+            ticket_lock.notifyAll();
+        }
+        return "Ticket Simulation Stopped";
+    }
+}

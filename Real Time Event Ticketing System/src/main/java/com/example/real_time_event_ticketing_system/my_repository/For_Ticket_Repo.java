@@ -12,10 +12,10 @@ import java.util.Optional;
 @Repository
 public interface For_Ticket_Repo extends JpaRepository<Tickets, Integer> {
 
-    @Query("SELECT COUNT(t) FROM Tickets t WHERE t.status_of_ticket = :availability")
-    int current_ticket_availability(@Param("availability") boolean availability);
+    @Query("SELECT COUNT(t) FROM Tickets t WHERE t.status_of_ticket = :status")
+    int current_ticket_availability(@Param("status") String status);
 
-    @Query("SELECT t FROM Tickets t WHERE t.status_of_ticket = false ORDER BY t.ticket_id ASC")
+    @Query("SELECT t FROM Tickets t WHERE t.status_of_ticket = 'unsold' ORDER BY t.ticket_id ASC")
     List<Tickets> To_find_availble_tickets();
 
     default Optional<Tickets> to_find_first_ticket() {

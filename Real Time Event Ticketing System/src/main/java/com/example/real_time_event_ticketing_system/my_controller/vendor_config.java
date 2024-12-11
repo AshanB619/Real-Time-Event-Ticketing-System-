@@ -17,12 +17,12 @@ public class vendor_config {
     @PostMapping("/add/vendors")
     public String Add_vendors(@RequestBody Vendor vendor) {
         forVendorRepo.save(vendor);
-        return "Vendor"+vendor.getVendor_Name()+" added successfully ";
+        return "Vendor "+vendor.getVendor_Name()+" added successfully ";
     }
 
-    @DeleteMapping("/remove/vendors/{id}")
+    @DeleteMapping("/remove/vendors/{vendor_id}")
     public String Remove_vendors(@PathVariable int vendor_id) {
         forVendorRepo.deleteById(vendor_id);
-        return "Vendor related to"+vendor_id+" deleted successfully " ;
+        return "Vendor related to id number "+vendor_id+" deleted successfully " ;
     }
 }

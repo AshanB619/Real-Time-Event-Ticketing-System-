@@ -10,13 +10,13 @@ import java.util.Collections;
 @Service
 @Scope("singleton")
 public class log_details_service {
-    private final List<String> details = Collections.synchronizedList(new ArrayList<>());
+    private final List<String> log_details = Collections.synchronizedList(new ArrayList<>());
 
     public synchronized void add_details(String log_details) {
-        details.add(log_details);
+        this.log_details.add(log_details);
     }
 
     public synchronized List<String> get_details() {
-        return new ArrayList<>(details); // Return a copy to prevent concurrent modification
+        return new ArrayList<>(log_details); // Return a copy to prevent concurrent modification
     }
 }

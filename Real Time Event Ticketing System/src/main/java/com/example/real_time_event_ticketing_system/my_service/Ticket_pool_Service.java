@@ -23,34 +23,33 @@ public class Ticket_pool_Service {
     }
 
     public synchronized void addTicket(int ticketNumber, Vendor vendor) {
-        Tickets ticket = new Tickets();
-        ticket.setTickets_Number(ticketNumber);
-        ticket.setStatus_of_ticket(false);
-        forTicketRepo.save(ticket);
+        Tickets ticket1 = new Tickets();
+        ticket1.setStatus_of_ticket("unsold");
+        forTicketRepo.save(ticket1);
 
-        int availableTickets = forTicketRepo.current_ticket_availability(false);
+        int find_Available_Tickets = forTicketRepo.current_ticket_availability("unsold");
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         String logAdd = String.format("Ticket_Number %d added to the pool by Vendor ID: %d, Vendor Name: %s | %d Tickets available | %s",
-                ticket.getTicket_id(), vendor.getVendor_Id(), vendor.getVendor_Name(), availableTickets, timestamp);
+                ticket1.getTicket_id(), vendor.getVendor_Id(), vendor.getVendor_Name(), find_Available_Tickets, timestamp);
 
         log_details_service.add_details(logAdd);
     }
 
     public synchronized boolean Release_Ticket(Customer customer) {
-        Optional<Tickets> optionalTicket = forTicketRepo.to_find_first_ticket();
-        if (optionalTicket.isPresent()) {
-            Tickets ticket = optionalTicket.get();
-            ticket.setStatus_of_ticket(true);
-            forTicketRepo.save(ticket);
+        Optional<Tickets> Ticket_Optional = forTicketRepo.to_find_first_ticket();
+        if (Ticket_Optional.isPresent()) {
+            Tickets ticket2 = Ticket_Optional.get();
+            ticket2.setStatus_of_ticket("sold");
+            forTicketRepo.save(ticket2);
 
-            int availableTickets = forTicketRepo.current_ticket_availability(false);
+            int find_Available_Tickets = forTicketRepo.current_ticket_availability("unsold");
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-            String logRelease = String.format("Ticket_Number %d bought from the pool by Customer ID: %d, Customer Name: %s | %d Tickets available | %s",
-                    ticket.getTicket_id(), customer.getCustomer_Id(), customer.getCustomer_Name(), availableTickets, timestamp);
+            String for_login_release = String.format("Ticket_Number %d bought from the pool by Customer ID: %d, Customer Name: %s | %d Tickets available | %s",
+                    ticket2.getTicket_id(), customer.getCustomer_Id(), customer.getCustomer_Name(), find_Available_Tickets, timestamp);
 
-            log_details_service.add_details(logRelease);
+            log_details_service.add_details(for_login_release);
             return true;
         } else {
             return false;
