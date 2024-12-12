@@ -14,11 +14,13 @@ public class System_details_config {
 
     @PostMapping("/set/details")
     public void set_system_details(@RequestBody system_details details) {
+        System.out.println("Received system configuration: " + details);
         this.system_details.setTotal_Number_of_Tickets(details.getTotal_Number_of_Tickets());
         this.system_details.setTickets_Release_rate(details.getTickets_Release_rate());
         this.system_details.setCustomer_Retrieval_Rate(details.getCustomer_Retrieval_Rate());
         this.system_details.setMaximum_Ticket_Capacity(details.getMaximum_Ticket_Capacity());
     }
+
 
 
 }
